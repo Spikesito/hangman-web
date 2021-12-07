@@ -16,6 +16,7 @@ type HangWebData struct {
 	ModifWordStr   string
 	NotAgainWeb    []rune
 	StrNotAgainWeb string
+	End            bool
 }
 
 func HandleHomePage(rw http.ResponseWriter, r *http.Request, d *HangWebData) {
@@ -50,6 +51,9 @@ func main() {
 		Pts.Input = r.FormValue("letter")
 		WordOrLetter(Pts)
 		RuneToStr(Pts)
+		if Pts.Attempts == 0 {
+			Pts.End = true
+		}
 		http.Redirect(rw, r, "/", http.StatusFound)
 	})
 
@@ -140,8 +144,8 @@ func InputWord(Pts *HangWebData, TabInput []rune, GGWP, TiretDu8 bool) {
 	}
 	if GGWP == true {
 		Pts.Attempts = 0
+		Pts.ModifWordRune = Pts.WordTFRune
 	} else if GGWP == false {
 		Pts.Attempts -= 2
 	}
-	Pts.ModifWordRune = Pts.WordTFRune
 }
