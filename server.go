@@ -8,7 +8,7 @@ import (
 )
 
 type HangWebData struct {
-	Letter         string
+	Input          string
 	Attempts       int
 	WordTFRune     []rune
 	WordTF         string
@@ -47,8 +47,8 @@ func main() {
 	})
 
 	http.HandleFunc("/hangman", func(rw http.ResponseWriter, r *http.Request) {
-		Pts.Letter = r.FormValue("letter")
-		InputLetter(Pts)
+		Pts.Input = r.FormValue("letter")
+		WordOrLetter(Pts)
 		RuneToStr(Pts)
 		http.Redirect(rw, r, "/", http.StatusFound)
 	})
@@ -69,12 +69,19 @@ func RuneToStr(Pts *HangWebData) {
 	Pts.StrNotAgainWeb = string(Pts.NotAgainWeb)
 }
 
-func InputLetter(Pts *HangWebData) {
+func WordOrLetter(Pts *HangWebData) {
 	GGWP := false
 	TiretDu8 := true
-	TabInput := []rune(Pts.Letter)
-	SameLetter := MemoriseLetter(Pts, TabInput)
+	TabInput := []rune(Pts.Input)
+	if len(Pts.Input) == 1 {
+		InputLetter(Pts, TabInput, GGWP, TiretDu8)
+	} else {
+		InputWord(Pts, TabInput, GGWP, TiretDu8)
+	}
+}
 
+func InputLetter(Pts *HangWebData, TabInput []rune, GGWP, TiretDu8 bool) {
+	SameLetter := MemoriseLetter(Pts, TabInput)
 	for i := 0; i < len(Pts.WordTFRune); i++ {
 		if TabInput[0] == Pts.WordTFRune[i] && Pts.ModifWordRune[i] == '_' {
 			Pts.ModifWordRune[i] = TabInput[0]
@@ -121,4 +128,20 @@ func MemoriseLetter(Pts *HangWebData, input []rune) bool {
 		}
 	}
 	return SameLetter
+}
+
+func InputWord(Pts *HangWebData, TabInput []rune, GGWP, TiretDu8 bool) {
+	GGWP = true
+	for i := 0; i < len(Pts.WordTFRune); i++ {
+		if TabInput[i] != Pts.WordTFRune[i] {
+			GGWP = false
+			break
+		}
+	}
+	if GGWP == true {
+		Pts.Attempts = 0
+	} else if GGWP == false {
+		Pts.Attempts -= 2
+	}
+	Pts.ModifWordRune = Pts.WordTFRune
 }
