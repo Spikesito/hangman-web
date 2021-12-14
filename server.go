@@ -16,56 +16,97 @@ type HangWebData struct {
 	ModifWordStr   string
 	NotAgainWeb    []rune
 	StrNotAgainWeb string
-	End            bool
+	Win            bool
+	MsgEnd         string
+	SetDifficulty  bool
+	Difficulty     string
 }
 
 func HandleHomePage(rw http.ResponseWriter, r *http.Request, d *HangWebData) {
-	tmp, _ := template.ParseFiles("./statics/hangman.html")
+	tmp, _ := template.ParseFiles("hangman.html")
 	tmp.Execute(rw, d)
+}
+
+func HandleEndPage(rw http.ResponseWriter, r *http.Request, d *HangWebData) {
+	tmpE, _ := template.ParseFiles("endgame.html")
+	tmpE.Execute(rw, d)
+}
+
+func HandleLevelPage(rw http.ResponseWriter, r *http.Request, d *HangWebData) {
+	tmpL, _ := template.ParseFiles("level.html")
+	tmpL.Execute(rw, d)
 }
 
 func main() {
 	fmt.Printf("Starting server at port 8080\n")
 
-	FilesName := []string{"./Game/main/words.txt", "./Game/main/words1.txt", "./Game/main/words2.txt"}
-	WordTF := hangman.FindRandomWord(FilesName, 0)
-	WordTFRune := []rune(WordTF)
-	ModifWordRune := hangman.ChangeWord(WordTF)
-	ModifWordStr := string(ModifWordRune)
-
-	Struct := HangWebData{
-		Attempts:      10,
-		ModifWordRune: ModifWordRune,
-		ModifWordStr:  ModifWordStr,
-		WordTF:        WordTF,
-		WordTFRune:    WordTFRune,
-		NotAgainWeb:   []rune{'0'},
-	}
+	var Struct HangWebData
 	Pts := &Struct
+	InitializeStruct(Pts)
+
+	fp := http.FileServer(http.Dir("./asset/"))
+	http.Handle("/asset/", http.StripPrefix("/asset/", fp))
+
+	fs := http.FileServer(http.Dir("./statics/"))
+	http.Handle("/statics/", http.StripPrefix("/statics/", fs))
 
 	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		HandleHomePage(rw, r, &Struct)
+		if Pts.SetDifficulty == false {
+			http.Redirect(rw, r, "/level", http.StatusFound)
+		} else {
+			HandleHomePage(rw, r, &Struct)
+		}
+	})
+
+	http.HandleFunc("/endgame", func(rw http.ResponseWriter, r *http.Request) {
+		Pts.SetDifficulty = false
+		HandleEndPage(rw, r, &Struct)
+	})
+
+	http.HandleFunc("/level", func(rw http.ResponseWriter, r *http.Request) {
+		if Pts.SetDifficulty == false {
+			Pts.SetDifficulty = true
+			Pts.Difficulty = r.FormValue("level")
+			HandleLevelPage(rw, r, &Struct)
+		} else {
+			http.Redirect(rw, r, "/", http.StatusFound)
+		}
 	})
 
 	http.HandleFunc("/hangman", func(rw http.ResponseWriter, r *http.Request) {
 		Pts.Input = r.FormValue("letter")
 		WordOrLetter(Pts)
 		RuneToStr(Pts)
-		if Pts.Attempts == 0 {
-			Pts.End = true
+		if Pts.Attempts > 0 {
+			http.Redirect(rw, r, "/", http.StatusFound)
+		} else {
+			End(Pts)
+			http.Redirect(rw, r, "/endgame", http.StatusFound)
 		}
-		http.Redirect(rw, r, "/", http.StatusFound)
 	})
 
-	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	// 	pts.Letter = r.FormValue("letter")
-	// 	tmpl.Execute(w, pts)
-	// 	// pts.WordTF = "bon_o__"
-	// 	// tmpl.Execute(w, pts)
-	// })
-
 	http.ListenAndServe(":8080", nil)
+}
 
+func InitializeStruct(Pts *HangWebData) {
+	Pts.Attempts = 10
+	FilesName := []string{"./Game/main/words.txt", "./Game/main/words1.txt", "./Game/main/words2.txt"}
+	Pts.WordTF = hangman.FindRandomWord(FilesName, ChooseFile(Pts))
+	Pts.WordTFRune = []rune(Pts.WordTF)
+	Pts.ModifWordRune = hangman.ChangeWord(Pts.WordTF)
+	Pts.ModifWordStr = string(Pts.ModifWordRune)
+	Pts.NotAgainWeb = []rune{'0'}
+}
+
+func ChooseFile(Pts *HangWebData) int {
+	if Pts.Difficulty == "0" {
+		return 0
+	} else if Pts.Difficulty == "1" {
+		return 1
+	} else if Pts.Difficulty == "2" {
+		return 2
+	}
+	return 0
 }
 
 func RuneToStr(Pts *HangWebData) {
@@ -111,6 +152,7 @@ func InputLetter(Pts *HangWebData, TabInput []rune, GGWP, TiretDu8 bool) {
 	}
 	if TiretDu8 == false {
 		Pts.Attempts = 0
+		End(Pts)
 	}
 }
 
@@ -145,7 +187,27 @@ func InputWord(Pts *HangWebData, TabInput []rune, GGWP, TiretDu8 bool) {
 	if GGWP == true {
 		Pts.Attempts = 0
 		Pts.ModifWordRune = Pts.WordTFRune
+		Pts.Win = true
 	} else if GGWP == false {
 		Pts.Attempts -= 2
 	}
+}
+
+func End(Pts *HangWebData) {
+	if Pts.Win == true {
+		Pts.MsgEnd = "GOOD JOB, YOU WON"
+	} else if Pts.Win == false {
+		Pts.MsgEnd = "YOU LOSE !!!"
+	}
+}
+
+func TiretDu8Left(Pts *HangWebData) bool {
+	for i := 0; i < len(Pts.ModifWordRune); i++ {
+		if Pts.ModifWordRune[i] == '_' {
+			return true
+		} else {
+			return false
+		}
+	}
+	return false
 }
