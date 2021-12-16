@@ -1,16 +1,78 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title> Hangman Web</title>
-        <link rel="stylesheet" href="/hangman-web/hangman.css">
+        <title>Hangman Web</title>
+        <link rel="stylesheet" href="statics/hangman.css">
     </head>
+    
     <body>
-        <div>
-            <div class="left">
-                <h1> Hello </h1>
+        <div class="container">
+            <div class="uppercase">
+                    <div class="squareleft"></div>
+                        <div class="displayHang">
+                            <!-- <div id="stickMan"> -->
+                        
+                                <!-- <div id="total"> -->
+                                {{if le .Attempts 7}}
+                                <div id="pos1"></div>
+                                {{end}}
+                                <div id="pos2">
+                                    {{if le .Attempts 7}}
+                                    <div id="upperwall"></div>
+                                    <div id="angle"></div>
+                                    {{end}}
+                                    {{if le .Attempts 6}}
+                                    <div id="rope"></div>
+                                    {{end}}
+                                </div>
+                                <div id="pos3">
+                                    {{if le .Attempts 8}}
+                                    <div id="midwall"></div>
+                                    {{end}}
+                                    {{if le .Attempts 5}}
+                                    <div id="head">
+                                        <div id="neck"></div>
+                                        <div id="FullBody">
+                                            {{if le .Attempts 3}}
+                                            <div id="leftarm"></div>
+                                            {{end}}
+                                            {{if le .Attempts 4}}
+                                            <div id="body"></div>
+                                        {{end}}
+                                        {{if le .Attempts 2}}
+                                        <div id="rightarm"></div>
+                                        {{end}}
+                                        </div>
+                                    <div id="legs">
+                                        {{if le .Attempts 1}}
+                                        <div id="leftleg"></div>
+                                        <!-- <div id="rightleg"></div> -->
+                                        {{end}}
+                                    </div>
+                                </div>
+                                    {{end}}
+                                </div>
+                                {{if le .Attempts 9}}
+                                <div id="pos4">
+                                </div>
+                                {{end}}
+                            <!-- </div> -->
+
+
+                            <!-- </div> -->
+                        </div>
+                    <div class="squareright"></div>
             </div>
-            <div class="right">
-                <h1> Bye </h1>
+
+            <div class="lowercase">
+                <h1> <strong> {{.ModifWordStr}} </strong> <br> You have {{.Attempts}} Attempts left. </h1>
+                <h2> Letters already used : {{.StrNotAgainWeb}} </h2>
+                <h4> {{.ErrorMsg}} </h4>
+                <p>Guess the correct Letter :</p>
+                <form action="/hangman" method="POST">
+                    <input type="text" name="letter" required autofocus autocomplete="off"><br />
+                    <input type="submit" class="send">
+                </form>
             </div>
         </div>
     </body>
