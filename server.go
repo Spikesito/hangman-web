@@ -20,6 +20,7 @@ type HangWebData struct {
 	MsgEnd         string
 	SetDifficulty  bool
 	Difficulty     string
+	ErrorMsg       string
 }
 
 func HandleHomePage(rw http.ResponseWriter, r *http.Request, d *HangWebData) {
@@ -102,6 +103,8 @@ func InitializeStruct(Pts *HangWebData) {
 	Pts.ModifWordRune = hangman.ChangeWord(Pts.WordTF)
 	Pts.ModifWordStr = string(Pts.ModifWordRune)
 	Pts.NotAgainWeb = []rune{'0'}
+	Pts.StrNotAgainWeb = ""
+	Pts.ErrorMsg = "Good Luck!"
 }
 
 func ChooseFile(Pts *HangWebData) int {
@@ -141,6 +144,7 @@ func InputLetter(Pts *HangWebData, TabInput []rune, GGWP, TiretDu8 bool) {
 	}
 
 	if GGWP == true {
+		Pts.ErrorMsg = "Good guess, keep it on!"
 		for i := 0; i < len(Pts.ModifWordRune); i++ {
 			if Pts.ModifWordRune[i] == '_' {
 				TiretDu8 = true
@@ -150,9 +154,10 @@ func InputLetter(Pts *HangWebData, TabInput []rune, GGWP, TiretDu8 bool) {
 			}
 		}
 	} else if GGWP == false && SameLetter == true {
-		fmt.Println(Pts.StrNotAgainWeb)
+		Pts.ErrorMsg = "You already used this letter."
 	} else if GGWP == false && Pts.Attempts > 1 {
 		Pts.Attempts--
+		Pts.ErrorMsg = "Wrong letter used."
 	} else {
 		Pts.Attempts--
 	}
@@ -195,6 +200,7 @@ func InputWord(Pts *HangWebData, TabInput []rune, GGWP, TiretDu8 bool) {
 		Pts.ModifWordRune = Pts.WordTFRune
 		Pts.Win = true
 	} else if GGWP == false {
+		Pts.ErrorMsg = "Wrong word entered."
 		Pts.Attempts -= 2
 	}
 }
