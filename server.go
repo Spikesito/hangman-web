@@ -1,7 +1,7 @@
 package main
 
 import (
-	hangman "Hangman/Game"
+	hangman "Hangman/Hangman"
 	"fmt"
 	"net/http"
 	"text/template"
@@ -97,7 +97,7 @@ func main() {
 
 func InitializeStruct(Pts *HangWebData) {
 	Pts.Attempts = 10
-	FilesName := []string{"Game/main/words.txt", "Game/main/words1.txt", "Game/main/words2.txt"}
+	FilesName := []string{"Hangman/words.txt", "Hangman/words1.txt", "Hangman/words2.txt"}
 	Pts.WordTF = hangman.FindRandomWord(FilesName, ChooseFile(Pts))
 	Pts.WordTFRune = []rune(Pts.WordTF)
 	Pts.ModifWordRune = hangman.ChangeWord(Pts.WordTF)
