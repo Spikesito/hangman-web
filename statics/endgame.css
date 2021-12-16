@@ -49,11 +49,11 @@ p {
 }
 
 button {
-    background-color: rgba(229,225,155,1);
+    background-color: rgb(223, 154, 27);
     color: black;
     padding: 15px 32px;
     border-radius: 12px;
-    border: 2px solid rgba(229,225,155,1);
+    border: 2px solid rgb(223, 154, 27);
     transition-duration: 0.4s;
     font-size: xx-large;
     bottom: 10px;
