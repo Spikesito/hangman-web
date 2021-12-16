@@ -2,20 +2,27 @@
 <html>
     <head>
         <title>Difficulty</title>
-        <link rel="stylesheet" href="./statics/level.css">
+        <link rel="stylesheet" href="statics/level.css">
     </head>
     <body>
-        <h1>Choose the difficulty of the game.</h1>
-        <form method="GET">
-            <input type="radio" id="easy" name="level" value="0" checked>
-            <label for="easy">Easy</label><br>
-            <input type="radio" id="medium" name="level" value="1">
-            <label for="medium">Medium</label><br>
-            <input type="radio" id="hard" name="level" value="2">
-            <label for="hard">Hard</label><br>
-        </form>
-        <a href="/">
-            <button name="button"><strong>Continue</strong></button>
-        </a> 
+        <main>
+            <form method="GET">
+                <div class="container">
+                    <!-- <input type="radio" class="radio" id="radio-1" name="level"/>
+                    <label for="radio-1"></label> -->
+                    <h1><strong>Choose your difficulty</strong></h1>
+                    <h2>Easy</h2>
+                    <h3>Medium</h3>
+                    <h4>Hard</h4>
+                    <input type="radio" class="radio" id="radio-2" name="level" value="0" checked/>
+                    <label for="radio-2"></label>
+                    <input type="radio" class="radio" id="radio-3" name="level" value="1"/>
+                    <label for="radio-3"></label>
+                    <input type="radio" class="radio" id="radio-4" name="level" value="2"/>
+                    <label for="radio-4"></label>
+                    <input type="submit" class="send" value="Let's GO">
+                </div>
+            </form>
+        </main>
     </body>
 </html>
