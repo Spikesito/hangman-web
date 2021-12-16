@@ -42,7 +42,6 @@ func main() {
 
 	var Struct HangWebData
 	Pts := &Struct
-	InitializeStruct(Pts)
 
 	fp := http.FileServer(http.Dir("./asset/"))
 	http.Handle("/asset/", http.StripPrefix("/asset/", fp))
@@ -59,16 +58,17 @@ func main() {
 	})
 
 	http.HandleFunc("/endgame", func(rw http.ResponseWriter, r *http.Request) {
-		Pts.SetDifficulty = false
 		HandleEndPage(rw, r, &Struct)
 	})
 
 	http.HandleFunc("/level", func(rw http.ResponseWriter, r *http.Request) {
-		if Pts.SetDifficulty == false {
-			Pts.SetDifficulty = true
-			Pts.Difficulty = r.FormValue("level")
+		input := r.FormValue("level")
+		if input == "" {
 			HandleLevelPage(rw, r, &Struct)
 		} else {
+			Pts.Difficulty = r.FormValue("level")
+			Pts.SetDifficulty = true
+			InitializeStruct(Pts)
 			http.Redirect(rw, r, "/", http.StatusFound)
 		}
 	})
@@ -80,6 +80,12 @@ func main() {
 		if Pts.Attempts > 0 {
 			http.Redirect(rw, r, "/", http.StatusFound)
 		} else {
+			if TiretDu8Left(Pts) == false {
+				Pts.Win = true
+			} else {
+				Pts.Win = false
+			}
+			Pts.SetDifficulty = false
 			End(Pts)
 			http.Redirect(rw, r, "/endgame", http.StatusFound)
 		}
@@ -90,7 +96,7 @@ func main() {
 
 func InitializeStruct(Pts *HangWebData) {
 	Pts.Attempts = 10
-	FilesName := []string{"./Game/main/words.txt", "./Game/main/words1.txt", "./Game/main/words2.txt"}
+	FilesName := []string{"Game/main/words.txt", "Game/main/words1.txt", "Game/main/words2.txt"}
 	Pts.WordTF = hangman.FindRandomWord(FilesName, ChooseFile(Pts))
 	Pts.WordTFRune = []rune(Pts.WordTF)
 	Pts.ModifWordRune = hangman.ChangeWord(Pts.WordTF)
@@ -205,8 +211,6 @@ func TiretDu8Left(Pts *HangWebData) bool {
 	for i := 0; i < len(Pts.ModifWordRune); i++ {
 		if Pts.ModifWordRune[i] == '_' {
 			return true
-		} else {
-			return false
 		}
 	}
 	return false
