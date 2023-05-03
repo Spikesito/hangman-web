@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EndGame</title>
+        <link rel="stylesheet" href="./statics/endgame.css">
+    </head>
+    <body>
+        <div class="total">
+            <div class="winlose">
+                  <h1>{{.MsgEnd}}</h1>
+            </div>
+            <div class="gameover">
+            </div>
+            <div class="replay">
+                <p>The word to find was "{{.WordTF}}"<br>Insert coins to continue</p>
+                <a href="/level">
+                    <button type="submit" >
+                        <div id="coin"></div>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </body>
+</html>
